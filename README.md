@@ -13,8 +13,6 @@
 
 🔹 Como rodar a aplicação
 
-🔹 Testes realizados
-
 🔹 Linguagens, dependências e libs utilizadas
 
 🔹 Desenvolvedores/Contribuintes

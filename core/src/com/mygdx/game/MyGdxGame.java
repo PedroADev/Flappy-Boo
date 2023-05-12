@@ -23,7 +23,7 @@ import java.util.Random;
 
 public class MyGdxGame extends ApplicationAdapter {
 
-
+// definicao de variaveis
 	private SpriteBatch batch;
 	private Texture[] passaros;
 	private Texture fundo;
@@ -35,7 +35,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	private Texture coin2;
 
-
+// colisores
 	private ShapeRenderer shapeRenderer;
 	private Circle circuloPassaro;
 	private Rectangle retanguloCanoCima;
@@ -50,7 +50,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Rectangle retanguloBaixo;
 
 
-
+// mais variaveis
 	private float larguraDispositivo;
 	private float alturaDispositivo;
 	private float variacao = 0;
@@ -79,6 +79,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	BitmapFont textoReiniciar;
 	BitmapFont textoMelhorPontuacao;
 
+	// sons 
 	Sound somVoando;
 	Sound somColisao;
 	Sound somPontuacao;
@@ -91,7 +92,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private final float VIRTUAL_WIDTH = 720;
 	private final float VIRTUAL_HEIGHT = 1280;
 
-
+// criacao dos metodos de iniciar texturas e objetos
 
 	@Override
 	public void create () {
@@ -112,7 +113,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	}
 
-
+// iniciar as texturas
 	private void inicializarTexturas(){
 
 		passaros = new Texture[3];
@@ -130,7 +131,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		coin2 = new Texture("coin2.png");
 
 	}
-
+// iniciar objetos
 	private void inicializaObjetos(){
 
 		batch = new SpriteBatch();
@@ -187,7 +188,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 
 	}
-
+// verifica o estado do jogo
 	private void verificarEstadoJogo() {
 
 		boolean toqueTela = Gdx.input.justTouched();
@@ -203,6 +204,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				gravidade = -15;
 				somVoando.play();
 			}
+			// atualiza a posicao dos canos
 			posicaoCanoHorizontal -= Gdx.graphics.getDeltaTime() * 200;
 			posicaoHorizontalCoin -= Gdx.graphics.getDeltaTime() * 200;
 
@@ -245,6 +247,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			;
 
 
+			// exibe tela de morte e pontuacao maxima
 		}else if(estadoJogo ==2) {
 			if( pontos > pontuacaoMaxima ) {
 				pontuacaoMaxima = pontos;
@@ -270,6 +273,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 
+	// detecta colisoes
 	private void detectarColisoes() {
 
 		circuloPassaro.set(
@@ -311,6 +315,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				passaros[0].getWidth() / 2, 10
 		);
 
+		// verifica se colidiu 
 		boolean colidiuCanoCima = Intersector.overlaps(circuloPassaro, retanguloCanoCima);
 		boolean colidiuCanoBaixo = Intersector.overlaps(circuloPassaro, retanguloCanoBaixo);
 		boolean colidiuCoin = Intersector.overlaps(circuloPassaro, circuloCoin);
@@ -318,6 +323,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		boolean colidiuCima = Intersector.overlaps(circuloPassaro, retanguloTopo);
 		boolean colidiuBaixo = Intersector.overlaps(circuloPassaro, retanguloBaixo);
 
+		// condicoes caso haja colisao
 		if (colidiuCanoCima || colidiuCanoBaixo) {
 			if(estadoJogo ==1) {
 				somColisao.play();
@@ -359,6 +365,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 
+	// desenha as texturas no jogo
 	private void desenharTexturas() {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
@@ -390,6 +397,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	}
 
+	// validacao de pontos caso o jogador passe pelos canos
 
 	public void validarPontos() {
 

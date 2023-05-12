@@ -31,10 +31,25 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Texture canoTopo;
 	private Texture gameOver;
 
+	private Texture coin;
+
+	private Texture coin2;
+
+
 	private ShapeRenderer shapeRenderer;
 	private Circle circuloPassaro;
 	private Rectangle retanguloCanoCima;
 	private Rectangle retanguloCanoBaixo;
+
+	private Circle circuloCoin;
+
+	private Circle circuloCoin2;
+
+	private Rectangle retanguloTopo;
+
+	private Rectangle retanguloBaixo;
+
+
 
 	private float larguraDispositivo;
 	private float alturaDispositivo;
@@ -50,6 +65,15 @@ public class MyGdxGame extends ApplicationAdapter {
 	private boolean passouCano = false;
 	private int estadoJogo = 0;
 	private float posicaoHorizontalPassaro = 0;
+	private Random randomCoin;
+
+	private float posicaoHorizontalCoin = 0;
+
+	private float posicaoVerticalCoin = 0;
+
+	private float posicaoVerticalCoin2 = 0;
+
+	private float posicaoHorizontalCoin2 = 0;
 
 	BitmapFont textoPontuacao;
 	BitmapFont textoReiniciar;
@@ -58,6 +82,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	Sound somVoando;
 	Sound somColisao;
 	Sound somPontuacao;
+	Sound somCoin;
 
 	Preferences preferencias;
 
@@ -100,18 +125,31 @@ public class MyGdxGame extends ApplicationAdapter {
 		canoTopo = new Texture("cano_topo_maior.png");
 		gameOver = new Texture("game_over.png");
 
+		coin = new Texture("coin1.png");
+
+		coin2 = new Texture("coin2.png");
+
 	}
 
 	private void inicializaObjetos(){
 
 		batch = new SpriteBatch();
 		random = new Random();
+		randomCoin = new Random();
 
 		larguraDispositivo = VIRTUAL_WIDTH;
 		alturaDispositivo = VIRTUAL_HEIGHT;
+
 		posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 		posicaoCanoHorizontal = larguraDispositivo;
 		espacoEntreCanos = 350;
+
+		posicaoHorizontalCoin = larguraDispositivo;
+		posicaoVerticalCoin = random.nextInt((int) alturaDispositivo);
+
+		posicaoHorizontalCoin2 = larguraDispositivo;
+		posicaoVerticalCoin2 = random.nextInt((int) alturaDispositivo);
+
 
 		textoPontuacao = new BitmapFont();
 		textoPontuacao.setColor(Color.WHITE);
@@ -129,10 +167,15 @@ public class MyGdxGame extends ApplicationAdapter {
 		circuloPassaro = new Circle();
 		retanguloCanoBaixo = new Rectangle();
 		retanguloCanoCima = new Rectangle();
+		circuloCoin = new Circle();
+		circuloCoin2 = new Circle();
+		retanguloTopo = new Rectangle();
+		retanguloBaixo = new Rectangle();
 
 		somVoando = Gdx.audio.newSound( Gdx.files.internal("som_asa.wav") );
 		somColisao = Gdx.audio.newSound( Gdx.files.internal("som_batida.wav") );
 		somPontuacao = Gdx.audio.newSound( Gdx.files.internal("som_pontos.wav") );
+		somCoin = Gdx.audio.newSound( Gdx.files.internal("coinsound.mp3"));
 
 		preferencias = Gdx.app.getPreferences("flappyBird");
 		pontuacaoMaxima = preferencias.getInteger("pontuacaoMaxima", 0);
@@ -140,6 +183,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		camera.position.set(VIRTUAL_WIDTH/2, VIRTUAL_HEIGHT/2,0);
 		viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
+
+
 
 	}
 
@@ -159,14 +204,46 @@ public class MyGdxGame extends ApplicationAdapter {
 				somVoando.play();
 			}
 			posicaoCanoHorizontal -= Gdx.graphics.getDeltaTime() * 200;
+			posicaoHorizontalCoin -= Gdx.graphics.getDeltaTime() * 200;
+
+			posicaoHorizontalCoin2 -= Gdx.graphics.getDeltaTime() * 200;
+
+
 			if( posicaoCanoHorizontal < -canoTopo.getWidth() ){
 				posicaoCanoHorizontal = larguraDispositivo;
 				posicaoCanoVertical = random.nextInt(400) - 200;
 				passouCano = false;
 			}
+
+			if( posicaoHorizontalCoin < -coin.getWidth() ){
+				posicaoHorizontalCoin = larguraDispositivo;
+				posicaoVerticalCoin = random.nextInt((int) alturaDispositivo);
+			}
+
+			if ( posicaoHorizontalCoin2 < -coin.getWidth() ){
+				posicaoHorizontalCoin2 = larguraDispositivo;
+				posicaoVerticalCoin2 = random.nextInt((int) alturaDispositivo);
+			}
+
 			if( posicaoInicialVerticalPassaro > 0 || toqueTela )
 				posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
 			gravidade++;
+
+
+			if (posicaoHorizontalCoin < -canoTopo.getWidth() ){
+				posicaoHorizontalCoin = larguraDispositivo+100;
+				posicaoVerticalCoin = randomCoin.nextInt((int) alturaDispositivo);
+			}
+
+			if (posicaoHorizontalCoin2 < -canoTopo.getWidth() ){
+				posicaoHorizontalCoin2 = larguraDispositivo+100;
+				posicaoVerticalCoin2 = randomCoin.nextInt((int) alturaDispositivo);
+			}
+			posicaoHorizontalCoin -= Gdx.graphics.getDeltaTime() * 200;
+
+			posicaoHorizontalCoin2 -= Gdx.graphics.getDeltaTime() * 200;
+			;
+
 
 		}else if(estadoJogo ==2) {
 			if( pontos > pontuacaoMaxima ) {
@@ -176,6 +253,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 			posicaoHorizontalPassaro -= Gdx.graphics.getDeltaTime()*500;
 
+
 			if(toqueTela){
 				estadoJogo = 0;
 				pontos = 0;
@@ -183,6 +261,10 @@ public class MyGdxGame extends ApplicationAdapter {
 				posicaoHorizontalPassaro = 0;
 				posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 				posicaoCanoHorizontal = larguraDispositivo;
+				posicaoHorizontalCoin = larguraDispositivo+100;
+				posicaoVerticalCoin = randomCoin.nextInt((int) alturaDispositivo);
+				posicaoHorizontalCoin2 = larguraDispositivo+100;
+				posicaoVerticalCoin2 = randomCoin.nextInt((int) alturaDispositivo);
 			}
 		}
 	}
@@ -207,14 +289,71 @@ public class MyGdxGame extends ApplicationAdapter {
 				canoTopo.getWidth(), canoTopo.getHeight()
 		);
 
+		circuloCoin.set(
+				posicaoHorizontalCoin + coin.getWidth() / 2,
+				posicaoVerticalCoin + coin.getWidth() / 2,
+				coin.getWidth() / 2
+		);
+
+		circuloCoin2.set(
+				posicaoHorizontalCoin2 + coin2.getWidth() / 2,
+				posicaoVerticalCoin2 + coin2.getWidth() / 2,
+				coin2.getWidth() / 2
+		);
+
+		retanguloTopo.set(
+				posicaoHorizontalPassaro + passaros[0].getHeight() / 2, alturaDispositivo,
+				passaros[0].getWidth() / 2, 10
+		);
+
+		retanguloBaixo.set(
+				50 + posicaoHorizontalPassaro + passaros[0].getWidth() / 2 , 0,
+				passaros[0].getWidth() / 2, 10
+		);
+
 		boolean colidiuCanoCima = Intersector.overlaps(circuloPassaro, retanguloCanoCima);
 		boolean colidiuCanoBaixo = Intersector.overlaps(circuloPassaro, retanguloCanoBaixo);
+		boolean colidiuCoin = Intersector.overlaps(circuloPassaro, circuloCoin);
+		boolean colidiuCoin2 = Intersector.overlaps(circuloPassaro, circuloCoin2);
+		boolean colidiuCima = Intersector.overlaps(circuloPassaro, retanguloTopo);
+		boolean colidiuBaixo = Intersector.overlaps(circuloPassaro, retanguloBaixo);
 
 		if (colidiuCanoCima || colidiuCanoBaixo) {
 			if(estadoJogo ==1) {
 				somColisao.play();
 				estadoJogo = 2;
 			}
+		}
+
+		if (colidiuCoin){
+			pontos += 10;
+			posicaoHorizontalCoin = alturaDispositivo;
+			posicaoVerticalCoin = random.nextInt((int) alturaDispositivo);
+			somCoin.play();
+		}
+
+		if(colidiuBaixo) {
+			if(estadoJogo ==1) {
+				somColisao.play();
+				estadoJogo = 2;
+			}
+		}
+
+		if (colidiuCoin2){
+			pontos += 5;
+			posicaoHorizontalCoin2 = alturaDispositivo;
+			posicaoVerticalCoin2 = random.nextInt((int) alturaDispositivo);
+			somCoin.play();
+		}
+
+
+
+		if(colidiuCima) {
+			if(estadoJogo ==1) {
+				somColisao.play();
+				estadoJogo = 2;
+			}
+			
 		}
 
 	}
@@ -225,13 +364,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.begin();
 		batch.draw(fundo,0,0,larguraDispositivo, alturaDispositivo);
 		batch.draw(passaros[(int) variacao] ,
-			50 + posicaoHorizontalPassaro,posicaoInicialVerticalPassaro);
+				50 + posicaoHorizontalPassaro,posicaoInicialVerticalPassaro);
 		batch.draw(canoBaixo, posicaoCanoHorizontal,
 				alturaDispositivo / 2 - canoBaixo.getHeight() - espacoEntreCanos / 2 + posicaoCanoVertical);
 		batch.draw(canoTopo, posicaoCanoHorizontal,
 				alturaDispositivo / 2 + espacoEntreCanos / 2 + posicaoCanoVertical);
 		textoPontuacao.draw(batch, String.valueOf(pontos),larguraDispositivo / 2,
 				alturaDispositivo - 110);
+
+		batch.draw(coin, posicaoHorizontalCoin, posicaoVerticalCoin);
+
+		batch.draw(coin2, posicaoHorizontalCoin2, posicaoVerticalCoin2);
 
 		if (estadoJogo == 2) {
 			batch.draw(gameOver, larguraDispositivo / 2 - gameOver.getWidth()/2,

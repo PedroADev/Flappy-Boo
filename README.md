@@ -33,7 +33,7 @@ Um jogo criado no Android Studio baseado no clássico "Flappy Bird"
 ✔️ High Score
 
 ## Distribuição
-https://github.com/PedroADev/ringoapp
+https://github.com/PedroADev/Flappy-Boo
 
 ## Pré-requisitos ⚠️    
 - Android Studio
